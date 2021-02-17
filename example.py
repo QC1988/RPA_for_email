@@ -1,61 +1,70 @@
-Python 调用outlook发送邮件
+# coding: utf-8
+import win32com.client as win32
+import pythoncom
+import warnings
+import sys
 
-使用模块：win32com
-1. 模块安装
-pip install pypiwin32
-1
-2. 模块使用
-import win32com
-# 调用outlook application
-outlook = win32com.client.Dispatch('outlook.application')
-1
-2
-3
-3. 发送邮件
-# 创建一个item
-mail =  outlook.CreateItem(0)
-# 接收人
-mail.To =  "***@outlook.com;***@outlook.com"
-# 抄送人
-mail.CC =  "***@outlook.com;***@outlook.com"
-# 主题
-mail.Subject = "这里是一个邮件的主题"
-# Body
-mail.Body = "这里是一个邮件的主要内容"
-# 添加附件
-mail.Attachments.Add("这里是要添加附件的位置")
-# 可添加多个附件
-mail.Attachments.Add("这里是要添加附件的位置")
-# 最后发送邮件
-mail.Send()
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-4. 当outlook中有多个账号登陆时，选择某个特定的账号进行邮件的发送
-# 发件账户
-send_account = None
+_VERSION_ = 'v0.1.0'
 
-# 遍历所有的账户信息进行筛选
-for account in outlook.Session.Accounts:
-    # 选择要使用的邮箱账户
-    if account.DisplayName == "***@outlook.com":
-       # 赋值发件账户
-       send_account = account
-       break
+def show_version():
+    print("=" * 30)
+    print("Send_email_with_python.{}".format(_VERSION_).center(20))
+    print("=" * 30)
+show_version()
+
+warnings.filterwarnings('ignore')
+outlook = win32.Dispatch("Outlook.Application")
 mail = outlook.CreateItem(0)
-# 设置邮件的发件账户
-mail._oleobj_.Invoke(*(64209, 0, 8, 0, send_account))
-# 接下来操作同 1.3
+
+
+
+
+"""Set parameters"""
+
+account_send_mail   = 'sekikishuo@gmail.com' 
+To_list             = ['sekikishuo@gmail.com','qiqichang1@163.com'] 
+Cc_list             = ['sekikishuo@gmail.com']
+Subject             = 'Sending from seki'
+HTMLBody            = '''
+                        <H2>Hello, This is a test mail.</H2>
+                        Hello Guys. 
+                     '''
+attachment_path_filename_1 = "C:\\Users\\Qichang Ql\\Desktop\\テスト　FOR　PYTHON\\RPA_for_test\\RMA.xlsx"
+# attachment_path_filename_2 = ""
+# gmail = outlook.Session.Accounts.Item(2)
+# gmail = outlook.Session.Accounts[2]
+
+"""End for set parameters"""
+
+
+
+# Recipient
+To_str = ''
+for t in To_list:
+    To_str = To_str + ';' + t
+mail.To = To_str
+# CC
+Cc_str = ''
+for c in Cc_list:
+    Cc_str = Cc_str + ';' + t
+mail.Cc = Cc_str
+# Subject
+mail.Subject = Subject
+# Body
+mail.BodyFormat = 2  # 2: Html format
+mail.HTMLBody = HTMLBody
+# Attachments
+mail.Attachments.Add(attachment_path_filename_1)
+# mail.Attachments.Add(attachment_path_filename_2)
+
+# Send mail
+Send_mail = outlook.Session.Accounts[account_send_mail]
+mail._oleobj_.Invoke(*(64209, 0, 8, 0, Send_mail))
+# mail.Send()
+
+# Display
+mail.Display()
+
+
+# if __name__ == '__main__':
+#     sys.exit(main())
